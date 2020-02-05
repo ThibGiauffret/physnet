@@ -1,0 +1,8 @@
+Sur Linux :
+Ouvrir une console et se rendre dans le dossier PhysNet (à l'aide de la commande cd).
+Exécuter "npm install" pour installer PhysNet.
+Pour le lancer, exécuter "node server.js".
+
+Sur Windows :
+Exécuter "install.bat" pour la première installation.
+Pour lancer PhysNet, exécuter "start.bat".

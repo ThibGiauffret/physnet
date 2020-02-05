@@ -1,0 +1,22 @@
+[
+{"id": "test",
+"titre" : "Titre de la salle de classe",
+"niveau": "Seconde",
+"date": "vendredi 13 décembre",
+"documents" :[
+{   "id":"1" ,
+    "titre": "<i class=\"fas fa-file-pdf\"></i> Le sujet",
+    "texte": "Support papier de la séance.",
+    "url": "/data/files/test.pdf"
+},
+{   "id":"2" ,
+    "titre": "<i class=\"fas fa-check-square\"></i> Quiz",
+    "texte": "Quelques questions pour tester vos connaissances.",
+    "url": "/quiz.html?classe=test"
+}
+],
+"temps": "1h",
+"actif": 1,
+"visible": 1
+}
+]

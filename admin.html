@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+		<head>
+			<title>PhysNet | Administration</title>
+			<meta charset="utf-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=no">
+			<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+			<link rel="stylesheet" href="ressources/bootstrap-4/css/bootstrap.min.css">
+			<!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">-->
+			<link rel="stylesheet" href="ressources/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+			<link rel="stylesheet" href="ressources/css/style1.css">
+			<!--<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>-->
+			<script src="ressources/js/jquery-1.10.1.min.js"></script>
+			<!-- <script src="./socket.io/socket.io.js"></script>-->
+			<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>-->
+
+
+
+		</head>
+
+		<body>
+
+
+	  <div class="main">
+
+	    <div class="alert alert-primary" role="alert">
+	      <h2 class="d-flex justify-content-center">Administration de Quizy !</h2>
+	    </div>
+
+
+
+					<script>
+
+					// On récupère l'énoncé de la question et les réponses possibles
+					var obj;
+					var c=0;
+					$.getJSON("data/data.json", function(obj) {
+							for (i = 0; i < obj.questions.length; i++){
+								addElement(i);
+								c++;
+								document.getElementById("texte"+i).value = obj.questions[i].texte;
+								document.getElementById("question"+i).value = i+1;
+								for (j = 0; j < obj.questions[i].reponses.length; j++){
+									var objTo = document.getElementById("list"+i);
+							    var id = document.createElement("input");
+							    id.value = obj.questions[i].reponses[j].id;
+									id.name = "id";
+									id.type = "text";
+							    objTo.appendChild(id);
+									var texte = document.createElement("input");
+							    texte.value = obj.questions[i].reponses[j].texte;
+									texte.name = "texte";
+									texte.type = "text";
+							    objTo.appendChild(texte);
+									var points = document.createElement("input");
+							    points.value = obj.questions[i].reponses[j].points;
+									points.name = "points";
+									points.type = "text";
+							    objTo.appendChild(points);
+
+								};
+							};
+					});
+
+
+					function addElement (i) {
+						var question = document.createElement("div");   // Create a <button> element
+						question.innerHTML = 'Question <input id="question'+i+'"></input> : <input id="texte'+i+'"></input><br> <div id="list'+i+'"></div> <button id="addReponse'+i+'" onclick="addReponse('+i+')" class="btn btn-success">Ajouter une réponse</button>';                   // Insert text
+						document.body.appendChild(question);
+					}
+
+					function addReponse (i) {
+
+						var objTo = document.getElementById("list"+i);
+						var id = document.createElement("input");
+						id.value = "";
+						id.name = "id";
+						id.type = "text";
+						objTo.appendChild(id);
+						var texte = document.createElement("input");
+						texte.value = "";
+						texte.name = "texte";
+						texte.type = "text";
+						objTo.appendChild(texte);
+						var points = document.createElement("input");
+						points.value = "";
+						points.name = "points";
+						points.type = "text";
+						objTo.appendChild(points);
+
+					}
+
+					function addQuestion () {
+						addElement (c);
+						document.getElementById("question"+c).value = c+1;
+						c++;
+						console.log(c);
+					}
+
+					$(document).ready(function(){
+					$("#submit").click(function(){
+						console.log("coucou");
+						for (k = 0; k < c; k++){
+							save=$("#submit").val();
+	  					host = window.location.hostname;
+							id=k;
+							texte=document.getElementById("texte"+k).value;
+							var reponsesDiv = document.getElementById('list'+k);
+							nb_reponses=reponsesDiv.getElementsByTagName('input').length;
+							reponses=buildRequestStringData($('list'+k));
+
+							console.log(id);
+							console.log(texte);
+							console.log(nb_reponses);
+							console.log(reponses);
+						}
+          });
+
+					function buildRequestStringData(form) {
+				    var input = form.find('input'),
+				        requestString = '{';
+				    for (var i = 0; i < input.length; i++) {
+				            requestString += '"' + $(input[i]).attr('name') + '":"' + $(input[i]).val() + '",';
+
+				    }
+				    if (input.length > 0) {
+				        requestString = requestString.substring(0, requestString.length - 1);
+				    }
+				    requestString += '}';
+						console.log(input);
+				    return requestString;
+				}
+				});
+
+					</script>
+
+					<button id="addQuestion" onclick="addQuestion()" class="btn btn-primary">Ajouter une question</button>
+
+
+					<input type="button" class="btn btn-primary" id="submit" value="Sauvegarder"/>
+
+
+
+					<br>
+
+				</div>
+			</div>
+
+
+
+		</body>
+</html>

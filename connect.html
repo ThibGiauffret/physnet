@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+		<head>
+			<title>PhysNet | Connexion</title>
+			<meta charset="utf-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=no">
+			<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+			<link rel="stylesheet" href="ressources/bootstrap-4/css/bootstrap.min.css">
+			<!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">-->
+			<link rel="stylesheet" href="ressources/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+			<link rel="stylesheet" href="ressources/css/style1.css">
+			<!--<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>-->
+			<script src="ressources/js/jquery-1.10.1.min.js"></script>
+
+			<script src="ressources/qrcode/qrcode.min.js"></script>
+			<!-- <script src="./socket.io/socket.io.js"></script>-->
+			<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>-->
+
+		</head>
+
+		<body>
+
+
+	  <div class="main">
+
+
+
+						<script>
+						// On récupère les données du quiz
+						var obj;
+						$.getJSON("data/config.json", function(obj) {
+								document.getElementById("ip").innerHTML = "http://"+obj.config[0].local;
+
+								var qrcode = new QRCode(document.getElementById("qrcode"), {
+										text: "http://"+obj.local+"/index.html",
+										width: 450,
+										height: 450,
+										colorDark : "#000000",
+										colorLight : "#fff",
+										correctLevel : QRCode.CorrectLevel.H
+									});
+									qrcode.clear(); // clear the code.
+									qrcode.makeCode("http://"+obj.config[0].local); // make another code.
+						});
+						</script>
+
+
+						<div class="container">
+								<div class="card h-100 shadow bg-white">
+									<div class="card-header">
+										<h2 class="d-flex justify-content-center m-3">Connexion</h2>
+
+								  </div>
+
+
+								  <div class="card-body">
+										<p class="large">Pour accéder à PhysNet, connectez-vous à l'adresse suivante :<br>
+
+											<center> <span id="ip" class="huge"></span></center></p>
+
+
+										<p class="large">Ou flashez le qrcode suivant :
+
+											<center><span id="qrcode"></span></center>
+
+										</p>
+								  	</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+
+
+
+
+
+
+
+					<br>
+
+				</div>
+			</div>
+		</body>
+</html>

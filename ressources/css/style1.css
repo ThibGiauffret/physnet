@@ -1,0 +1,140 @@
+body{
+	background-color: #ECF1FF;
+	background-image: url(/ressources/background/cubes.png);
+
+}
+
+.large{
+	font-size: 20px;
+}
+
+.huge{
+	font-size: 30px;
+}
+
+.main{
+	margin: 60px;
+}
+
+.titre{
+	color: #888;
+}
+
+.card{
+	border-radius: 10px;
+	color: #000;
+}
+
+.violet{
+	background-color: #480080;
+	border: 1px solid #480080;
+}
+
+.date{
+	color: #555;
+}
+
+.question{
+	font-size: 20px;
+	font-weight: bold;
+}
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 19px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(22px);
+  -ms-transform: translateX(22px);
+  transform: translateX(22px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.checkbox_reponse{
+	visibility: hidden;
+  position: absolute;
+}
+
+.card_button{
+	white-space: nowrap;
+}
+
+
+@media (max-width: 500px) {
+	body {
+		padding: 0!important;
+		margin: 0!important;
+	}
+
+	.main {
+		font-size: 16px!important;
+		width: 100%;
+		border-bottom-width: 0px;
+		padding: 10px!important;
+		margin: 0!important;
+	}
+
+	.question{
+		font-size: 20px;
+		font-weight: bold;
+	}
+
+	.box{
+
+		padding : 20px !important;
+
+	}
+
+}

@@ -1,0 +1,21 @@
+{"titre" : "Un premier QCM",
+"questions" :[
+{   "id":"1" ,
+    "texte": "Quelle est la couleur du cheval blanc d'Henri IV ?<br> <center><img src=\"/data/images/cat.jpeg\"></center>",
+    "reponses":[
+        {"id" : "A", "texte": "Blanc", "points":2},
+        {"id" : "B", "texte": "Noir", "points":0}
+    ],
+    "temps":0.2
+},
+{   "id":"2",
+    "texte": "Quelle est l'expression vectorielle de la force d'interaction gravitationnelle ?",
+    "reponses":[
+        {"id" : "A", "texte": "$\\vec{P} = m \\times \\vec{g}$", "points":0},
+        {"id" : "B", "texte": "$F = \\cfrac{G \\times m_A \\times m_B}{d^2}$", "points":0},
+        {"id" : "C", "texte": "$\\vec{F} = \\cfrac{G \\times m_A \\times m_B}{d^2} \\vec{u}$", "points":3}
+    ],
+    "temps":2
+}
+]
+}

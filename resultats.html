@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+		<head>
+			<title>PhysNet | Quiz</title>
+			<meta charset="utf-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=no">
+			<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+			<link rel="stylesheet" href="ressources/bootstrap-4/css/bootstrap.min.css">
+			<!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">-->
+			<link rel="stylesheet" href="ressources/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+			<link rel="stylesheet" href="ressources/css/style1.css">
+			<!--<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>-->
+			<script src="ressources/js/jquery-1.10.1.min.js"></script>
+			<script type="text/javascript" src="ressources/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+			<script src="/socket.io/socket.io.js"></script>
+			<!-- <script src="./socket.io/socket.io.js"></script>-->
+			<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>-->
+
+
+			<script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            processEscapes: true
+          }
+        });
+      </script>
+
+
+			<script>
+
+			var local = "";
+			var emplacement = "";
+			$.getJSON("data/config.json", function(obj) {
+					 local = obj.config[0].local;
+					 emplacement = obj.config[0].emplacement;
+				 });
+
+
+			var socket = io.connect('http://'+local);
+
+			$(document).ready(function(){
+
+				var resultats = getCookie('resultats');
+				if (resultats != "1"){
+						window.location.replace("/index.html?message=denied");
+				}
+
+
+
+
+				var nom = getCookie('nom');
+				var quiz = getCookie('quiz');
+
+				socket.emit('resultats', {nom:nom, quiz:quiz});
+				//var nom = new URLSearchParams(window.location.search).get("nom");
+				document.getElementById("nom").innerHTML = nom+", voici vos résultats !";
+
+				var obj;
+				var emplacement;
+
+				var total = 0;
+				var points_tot = 0;
+
+				socket.on('resultats', function(data) {
+
+					titres = JSON.parse(data.titres);
+          points_tot = JSON.parse(data.points_tot);
+          reponses_correctes = JSON.parse(data.reponses_correctes);
+          textes_corrects = JSON.parse(data.textes_corrects);
+          id_questions = JSON.parse(data.id_questions);
+          id_reponses = JSON.parse(data.id_reponses);
+          textes_reponses = JSON.parse(data.textes_reponses);
+          totaux = JSON.parse(data.totaux);
+					var note_max = 0;
+					var note = 0;
+
+				 for (k=0; k < id_questions.length; k++){
+
+					 titre = titres[k];
+           point_tot = points_tot[k];
+           reponse_correcte = reponses_correctes[k].toString().split(',').join(', ');
+           texte_correct = textes_corrects[k].toString().split(',').join(', ');
+           c = id_questions[k];
+           id_reponse = id_reponses[k].toString().split(',').join(', ');
+           texte_reponse = textes_reponses[k].toString().split(',').join(', ');
+           total = totaux[k];
+
+					 note += parseFloat(total);
+					 note_max += parseFloat(point_tot);
+
+
+
+					 var objTo = document.getElementById("list");
+					 var divQuestion = document.createElement("li");
+					 divQuestion.classList.add('list-group-item');
+					 divQuestion.innerHTML = '<h5 class="mb-2">Question '+c+' : '+titre+'</h5><br>Votre réponse : <br><center><span class="badge badge-secondary large ml-3 mr-3 violet">'+id_reponse+'</span>'+texte_reponse+'</center><br> Réponse(s) attendue(s) : <br><center><span class="badge badge-secondary large ml-3 mr-3 violet">'+reponse_correcte+'</span>'+texte_correct+'</center><br><span class="badge badge-warning large">'+total+' points attribué(s)</span>';
+					 objTo.appendChild(divQuestion);
+				 }
+
+				 var objTo = document.getElementById("note");
+				 var divNote = document.createElement("div");
+				 divNote.innerHTML = '<center><h2><span class="badge badge-secondary violet">Note : '+note+'/'+note_max+'</span></h2></center></div>';
+				 objTo.appendChild(divNote);
+				 console.log("Votre note est de : "+note+"/"+note_max);
+			 });
+
+			function getCookie(name) {
+					var nameEQ = name + "=";
+					var ca = document.cookie.split(';');
+					for(var i=0;i < ca.length;i++) {
+							var c = ca[i];
+							while (c.charAt(0)==' ') c = c.substring(1,c.length);
+							if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+					}
+					return null;
+			}
+
+			});
+
+
+
+			</script>
+
+		</head>
+
+		<body>
+
+
+	  <div class="main">
+
+
+			<div class="container">
+					<div class="card h-100 shadow bg-white">
+						<div class="card-header">
+							<h2 class="d-flex justify-content-center"><span id="nom"></span></h2>
+							<div class="mt-2">
+
+								<div id="note" class="mb-3"></div>
+
+							</div>
+						</div>
+
+
+
+						<ul class="list-group list-group-flush" id="list"></ul>
+
+						<div class="card-body">
+								<button id="submit" onclick="eraseAllCookies()" class="btn btn-danger">Quitter</button>
+						</div>
+					</div>
+			</div>
+
+
+
+				<script>
+				function eraseAllCookies() {
+						document.cookie = 'nom=; Max-Age=-99999999;';
+						document.cookie = 'question=; Max-Age=-99999999;';
+						document.cookie = 'resultats=; Max-Age=-99999999;';
+						document.cookie = 'timeout=; Max-Age=-99999999;';
+						document.cookie = 'quiz=; Max-Age=-99999999;';
+						document.cookie = 'temps=; Max-Age=-99999999;';
+						window.location.replace("/index.html");
+				}
+				</script>
+
+
+			</div>
+		</body>
+</html>

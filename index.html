@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+		<head>
+			<title>PhysNet | Accueil</title>
+			<meta charset="utf-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=no">
+			<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+			<script src="ressources/js/jquery-1.10.1.min.js"></script>
+			<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+			<link rel="stylesheet" href="ressources/bootstrap-4/css/bootstrap.min.css">
+			<!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">-->
+			<link rel="stylesheet" href="ressources/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+      <script src="ressources/bootstrap-4/js/bootstrap.min.js"></script>
+      <link rel="stylesheet" href="ressources/css/style1.css">
+			<!--<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>-->
+
+			<!-- <script src="./socket.io/socket.io.js"></script>-->
+			<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>-->
+
+			<script>
+
+			function setCookie(name,value,time) {
+		    var expires = "";
+		    if (time) {
+		        var date = new Date();
+		        date.setTime(date.getTime() + (time*60*60*1000));
+		        expires = "; expires=" + date.toUTCString();
+		    }
+			    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+			}
+
+			function getCookie(name) {
+					var nameEQ = name + "=";
+					var ca = document.cookie.split(';');
+					for(var i=0;i < ca.length;i++) {
+							var c = ca[i];
+							while (c.charAt(0)==' ') c = c.substring(1,c.length);
+							if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+					}
+					return null;
+			}
+
+			function eraseCookie(name) {
+			    document.cookie = name+'=; Max-Age=-99999999;';
+			}
+
+			function loadJSON(callback) {
+		    var xobj = new XMLHttpRequest();
+		    xobj.overrideMimeType("application/json");
+		    xobj.open('GET', 'data/classroom.json', true); // Replace 'my_data' with the path to your file
+		    xobj.onreadystatechange = function () {
+		          if (xobj.readyState == 4 && xobj.status == "200") {
+		            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+		            callback(xobj.responseText);
+		          }
+		    };
+		    xobj.send(null);
+	 		}
+
+			function getObjects(obj, key, val) {
+			    var objects = [];
+			    for (var i in obj) {
+			        if (!obj.hasOwnProperty(i)) continue;
+			        if (typeof obj[i] == 'object') {
+			            objects = objects.concat(getObjects(obj[i], key, val));
+			        } else
+			        //if key matches and value matches or if key matches and value is not passed (eliminating the case where key matches but passed value does not)
+			        if (i == key && obj[i] == val || i == key && val == '') { //
+			            objects.push(obj);
+			        } else if (obj[i] == val && key == ''){
+			            //only add if the object is not already in the array
+			            if (objects.lastIndexOf(obj) == -1){
+			                objects.push(obj);
+			            }
+			        }
+			    }
+			    return objects;
+			}
+
+			$(document).ready(function(){
+
+					eraseCookie('classroom');
+				 loadJSON(function(response) {
+				  // Parse JSON string into object
+				    var data = JSON.parse(response);
+						//console.log(data);
+
+					for(var i=0;i < data.length;i++) {
+								if (data[i].visible == 1){
+									var objto = document.getElementById("classroom_list");
+									var li = document.createElement("li");
+									li.classList.add('list-group-item');
+									if (data[i].actif == 1){
+										li.innerHTML = '<span class="badge badge-warning">'+data[i].niveau+'</span><h5 class="mb-0">'+data[i].titre+'</h5><p class="date">'+data[i].date+'</p><a href="/classroom.html?classe='+data[i].id+'" class="btn btn-primary btn-sm"><i class="fas fa-door-open"></i>&nbsp;Entrer</a>';
+									}
+									if (data[i].actif == 0){
+										li.innerHTML = '<span class="badge badge-warning">'+data[i].niveau+'</span><h5 class="mb-0">'+data[i].titre+'</h5><p class="date">'+data[i].date+'</p><a href="#" class="btn btn-primary btn-sm disabled"><i class="fas fa-door-open"></i>&nbsp;Entrer</a>';
+									}
+									objto.appendChild(li);
+								}
+						};
+
+
+				 });
+			 });
+
+			</script>
+
+		</head>
+
+		<body>
+
+
+	  <div class="main">
+
+			  <div id="message"></div>
+
+
+
+				<script>
+					$(document).ready(function(){
+					$("#myInput").on("keyup", function() {
+						var value = $(this).val().toLowerCase();
+						$("#classroom_list li").filter(function() {
+							$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+						});
+					});
+					});
+				</script>
+
+
+				<div class="container">
+						<div class="card h-100 shadow bg-white">
+							<div class="card-header">
+								<h2 class="d-flex justify-content-center m-3"><i class="fas fa-atom"></i>&nbsp;PhysNet</h2>
+
+						  </div>
+							<div class="form-group input-group p-2 mb-0">
+					    	<div class="input-group-prepend">
+							    <span class="input-group-text"> <i class="fas fa-search"></i> </span>
+								</div>
+					      	<input class="form-control" id="myInput" type="text" placeholder="Rechercher une salle de classe...">
+					    </div>
+							<ul class="list-group list-group-flush" id="classroom_list">
+						  </ul>
+						  <div class="card-body">
+								<a data-toggle="modal" href="#propos" class="btn ml-0 card-link" ><i class="fas fa-info-circle"></i>&nbsp;À propos</a>
+						  </div>
+						</div>
+				</div>
+
+
+
+						<br>
+						</div>
+				</div>
+			</div>
+
+
+			<div class="modal fade" id="propos" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			  <div class="modal-dialog" role="document">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <h5 class="modal-title" id="exampleModalLabel">À propos</h5>
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			          <span aria-hidden="true">&times;</span>
+			        </button>
+			      </div>
+			      <div class="modal-body">
+							<p>PhysNet &copy; pour ensciences.fr (2020)<br>
+
+			        Développement : Th. G<br>
+
+							Version : 2020_01_13_alpha</p>
+			      </div>
+
+			    </div>
+			  </div>
+			</div>
+
+		</body>
+</html>

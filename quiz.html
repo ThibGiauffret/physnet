@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+		<head>
+			<title>PhysNet | Quiz</title>
+			<meta charset="utf-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=no">
+			<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+			<link rel="stylesheet" href="ressources/bootstrap-4/css/bootstrap.min.css">
+			<!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">-->
+			<link rel="stylesheet" href="ressources/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+			<link rel="stylesheet" href="ressources/css/style1.css">
+			<!--<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>-->
+
+
+			<script src="ressources/js/jquery-1.10.1.min.js"></script>
+			<script src="/socket.io/socket.io.js"></script>
+
+			<!-- <script src="./socket.io/socket.io.js"></script>-->
+			<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>-->
+
+			<script>
+
+			var url_string = window.location.href ; //window.location.href
+			var url = new URL(url_string);
+			var quiz = url.searchParams.get("classe");
+
+			console.log(quiz);
+			if (quiz == null){
+				quiz = getCookie("classroom");
+			}
+
+			// On lance la connexion socket
+			var local = "";
+			var emplacement = "";
+			$.getJSON("data/config.json", function(obj) {
+					 local = obj.config[0].local;
+					 emplacement = obj.config[0].emplacement;
+				 });
+
+			var socket = io.connect('http://'+local);
+
+			socket.on('redirect', function(destination) {
+					window.location.href = destination;
+			});
+
+			socket.emit('index', quiz);
+
+
+			$(document).ready(function(){
+
+				eraseAllCookies();
+
+
+				// On vérifie s'il existe un cookie créé. Si c'est le cas, c'est que l'utilisateur existe donc on redirige vers le quiz.
+				var nom = getCookie('nom');
+				if (nom != null){
+						window.location.replace("/quiz.html"+"&classe="+quiz);
+				}
+
+			// On récupère les données du quiz
+			var titre = "";
+			var question_max=0;
+			var temps=0;
+			var points=0;
+
+			socket.on('index', function(data) {
+
+					titre = data.titre;
+					question_max = data.question_max;
+					temps = data.temps;
+					points = data.points;
+
+					temps = temps*60;
+					minutes = parseInt(temps / 60, 10);
+					seconds = parseInt(temps % 60, 10);
+
+					minutes = minutes < 10 ? "0" + minutes : minutes;
+					seconds = seconds < 10 ? "0" + seconds : seconds;
+
+					document.getElementById("titre").innerHTML = titre;
+					document.getElementById("questions").innerHTML = question_max;
+					document.getElementById("points").innerHTML = points;
+					document.getElementById("temps").innerHTML = minutes + ":" + seconds;
+
+
+			});
+
+
+			// On envoie les données de connexion
+			var nom;
+			$("#register").click(function(){
+
+
+				nom=$("#nom").val();
+
+				// On vérifie que l'utilisateur n'est pas déjà inscrit
+				if(nom == "" || /^[a-zA-Z0-9]+$/.test(nom)==false){
+					window.location.replace("/quiz.html?message=invalid_username"+"&classe="+quiz);
+				} else {
+					if(UrlExists(emplacement+"/"+quiz+"_"+nom+".json")){
+						console.log("L'utilisateur existe déjà !");
+						window.location.replace("/quiz.html?message=user_exists"+"&classe="+quiz);
+					}else{
+						socket.emit('register', {nom:nom, quiz:quiz});
+						eraseCookie('nom');
+						eraseCookie('question');
+						eraseCookie('resultats');
+						setCookie('nom',nom,1);
+						setCookie('question',1,1);
+						setCookie('resultats',0,1);
+						setCookie('timeout',0,1);
+						setCookie('temps',"0",1);
+						setCookie('quiz',quiz,1);
+						console.log("L'utilisateur va être créé !");
+					}
+				}
+			});
+
+		// Affichage des messages
+
+		var message = new URLSearchParams(window.location.search).get("message");
+
+		  if (message == "invalid_username") {
+		    document.getElementById("message").innerHTML = '<div class="alert alert-warning alert-dismissible fade show" role="alert">Veuillez entrer un nom d\'utilisateur valide (contenant seulement des lettres ou des chiffres)&nbsp;!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+		  }
+
+			if (message == "user_exists") {
+		    document.getElementById("message").innerHTML = '<div class="alert alert-warning alert-dismissible fade show" role="alert">Cet utilisateur existe déjà&nbsp;!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+		  }
+
+			if (message == "quiz_reference_needed") {
+		    document.getElementById("message").innerHTML = '<div class="alert alert-warning alert-dismissible fade show" role="alert">Aucune référence de quiz n\'est indiquée&nbsp;!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+		  }
+
+
+		});
+
+		function UrlExists(url)
+		{
+		    var http = new XMLHttpRequest();
+		    http.open('HEAD', url, false);
+		    http.send();
+		    return http.status!=404;
+		}
+
+		function setCookie(name,value,time) {
+	    var expires = "";
+	    if (time) {
+	        var date = new Date();
+	        date.setTime(date.getTime() + (time*60*60*1000));
+	        expires = "; expires=" + date.toUTCString();
+	    }
+		    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+		}
+
+		function getCookie(name) {
+				var nameEQ = name + "=";
+				var ca = document.cookie.split(';');
+				for(var i=0;i < ca.length;i++) {
+						var c = ca[i];
+						while (c.charAt(0)==' ') c = c.substring(1,c.length);
+						if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+				}
+				return null;
+		}
+
+		function eraseCookie(name) {
+		    document.cookie = name+'=; Max-Age=-99999999;';
+		}
+
+		function eraseAllCookies() {
+				document.cookie = 'nom=; Max-Age=-99999999;';
+				document.cookie = 'question=; Max-Age=-99999999;';
+				document.cookie = 'resultats=; Max-Age=-99999999;';
+				document.cookie = 'timeout=; Max-Age=-99999999;';
+				document.cookie = 'quiz=; Max-Age=-99999999;';
+				document.cookie = 'temps=; Max-Age=-99999999;';
+		}
+
+			</script>
+
+		</head>
+
+		<body>
+
+
+	  <div class="main">
+
+			  <div id="message"></div>
+
+
+
+				<div class="d-flex flex-row-reverse large" id="time_container">
+		      <div class="p-2" ><label class="switch">
+					  <input type="checkbox">
+					  <span class="slider round"></span>
+					</label></div>
+		      <div class="pt-2"><span class="large">Dys</span></div>
+		    </div>
+
+
+				<div class="container">
+						<div class="card h-100 shadow bg-white">
+							<div class="card-header">
+								<h2 class="d-flex justify-content-center m-3"><i class="fas fa-check-square"></i>&nbsp;Quiz</h2>
+							</div>
+
+							<div class="card-body">
+								<p class="large">
+									<strong>Titre du quiz : <span id="titre"></span></strong><br>
+									Nombre de questions :	<span id="questions"></span><br>
+									Points : <span id="points"></span><br>
+									Temps total : <span id="temps"></span><br>
+								</p>
+
+								<p>Pour commencer le quiz, entrez votre nom ci-après&nbsp;:</p>
+								<div class="input-group mb-3">
+
+						      <input type="text" class="form-control" id="nom" placeholder="Votre nom" aria-label="Reponse" required>
+									<div class="input-group-append large">
+										<input type="button" class="btn btn-success" id="register" value="Commencer">
+						      </div>
+						    </div>
+							</div>
+						</div>
+				</div>
+
+
+
+
+
+
+
+
+
+
+
+
+						<br>
+						</div>
+				</div>
+			</div>
+		</body>
+</html>
