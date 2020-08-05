@@ -9,7 +9,7 @@
     "body-parser": "1.19.0",
     "socket.io": "2.3.0",
     "fs-extra": "8.1.0",
-    "express-fileupload": "1.1.6",
+    "express-fileupload": "1.1.9",
     "mkdirp": "1.0.3",
     "serve-favicon": "2.5.0"
   },
